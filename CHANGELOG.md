@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.2](https://github.com/candyboyz/browserify-steam-session/compare/v1.1.0...v1.1.2) (2024-09-07)
+
+
+### Bug Fixes
+
+* workflows build package ([5e94330](https://github.com/candyboyz/browserify-steam-session/commit/5e9433068dda68370aba031daccbdbce94cb0bac))
+
 ## [1.1.0](https://github.com/candyboyz/browserify-steam-session/compare/v1.0.4...v1.1.0) (2024-09-07)
 
 
