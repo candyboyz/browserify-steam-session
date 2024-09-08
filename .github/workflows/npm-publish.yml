@@ -23,7 +23,7 @@ jobs:
         run: npm install
 
       - name: Build package
-        run: npm run build
+        run: npm run build:main
 
       - name: Publish to npm
         run: npm publish --non-interactive
