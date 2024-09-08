@@ -1,7 +1,6 @@
 import { Buffer } from 'buffer';
-import Crypto from 'crypto';
 
-export class SteamTotp {
+class SteamTotp {
   private readonly DIGITS = 5;
   private readonly PERIOD = 30;
   private readonly ALPHABET = '23456789BCDFGHJKMNPQRTVWXY';
@@ -19,18 +18,28 @@ export class SteamTotp {
     buffer.writeUint32BE(0, 0);
     buffer.writeUint32BE(Math.floor(time / 30), 4);
 
-    const hmac = Crypto.createHmac('sha1', keyData);
-    let hmacBuffer = hmac.update(buffer).digest();
+    const cryptoKey = await crypto.subtle.importKey(
+      'raw',
+      keyData,
+      { name: 'HMAC', hash: 'SHA-1' },
+      false,
+      ['sign']
+    );
 
-    const start = hmac[19] & 0x0f;
-    hmacBuffer = hmacBuffer.slice(start, start + 4);
+    const hmac = await crypto.subtle.sign('HMAC', cryptoKey, buffer);
+    const hmacResult = new Uint8Array(hmac);
 
-    let fullcode = hmacBuffer.readUInt32BE(0) & 0x7fffffff;
+    const start = hmacResult[hmacResult.length - 1] & 0x0f;
+    let material =
+      ((hmacResult[start] & 0x7f) << 24) |
+      ((hmacResult[start + 1] & 0xff) << 16) |
+      ((hmacResult[start + 2] & 0xff) << 8) |
+      (hmacResult[start + 3] & 0xff);
 
     let code = '';
     for (let i = 0; i < this.DIGITS; i++) {
-      code += this.ALPHABET.charAt(fullcode % this.ALPHABET.length);
-      fullcode /= this.ALPHABET.length;
+      code += this.ALPHABET[material % this.ALPHABET.length];
+      material = Math.floor(material / this.ALPHABET.length);
     }
 
     return code;
@@ -48,3 +57,5 @@ export class SteamTotp {
     return secret;
   }
 }
+
+export default new SteamTotp();
